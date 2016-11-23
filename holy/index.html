@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Weather App - Holy</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta property="og:title" content="Weather App" />
+  <meta property="og:description" content="Weather App" />
+  <meta property="og:image" content="../holy/umbrella.png" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="./css/loader.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.1/angular.min.js"></script>
+  <script src="./js/controller.js"></script>
+  <link href="https://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
+</head>
+<body class="bg-color-pink" onload="loader()">
+<div id="loader"></div>
+<div class="container-fluid" ng-app="myApp" ng-controller="Ctrl" id="content" style="display:none;">
+	<div class="row" id="row-main">	
+		<!--Sidebar-->
+		<div class="col-xs-3 collapsed" id="sidebar">
+					<div class="row sidebar-top" style="margin-left:3px!important;">
+					<div class="row">Your</div>
+					<div class="row">best </div>
+					<div class="row">weather</div>
+					<div class="row">app</div>
+			</div>
+			<div class="row sidebar-bottom" style="margin-left:3px!important;margin-top:25%">
+					<div class="row" style="width: 10%;"><div class="separator"></div></div>
+					<div class="row">team</div>
+					<div class="row">history </div>
+					<div class="row">contact</div>
+			</div>
+			<div class="row sidebar-social" style="margin-left:3px!important;margin-top:35%">
+					<div class="row">Suggest to a friend</div>
+					<div class="row" style="margin-top:5%">
+						<div class="col-xs-2 social-icons" data-href="http://holy.gd/" data-layout="button" data-size="large" data-mobile-iframe="true"><a class="fb-xfbml-parse-ignore" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fholy.gd%2F&amp;src=sdkpreparse"><i class="icon-facebook icons"></i></a></div>
+						<div class="col-xs-2 social-icons"><a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=Weather%20App" target="_blank"><i class="icon-twitter icons"></i></a></div>
+						<div class="col-xs-2 g-follow" data-href="http://holy.gd/" data-rel="author"><i class="icon-google-plus icons" ></i></div>
+					</div>
+			</div>
+		</div>
+
+		<!--Main page content-->
+		<div>
+			<!--Search screen-->
+			<div ng-show="weather === True" id="search" class="col-xs-12" style="height: 100vh;" >
+				<div class="row">
+					<div class="btn-group" role="group" aria-label="Controls" style="margin:1%;">
+						<i id="toogle-icon" style="color:#70ff91;font-size:25px!important;cursor: pointer;" class="icon-reorder toggle-sidebar"></i>
+					</div>
+					<div class="centered"><a href="#"><img style="width:30px;position: relative;top: -5%;" src="../holy/images/umbrella.png" alt="" /></a></div>
+				</div>
+				<div class="row animate-bottom" style="bottom:-20vh;">
+					<!--First label (type a location)-->
+					<div class="row labels"><span>type a location:</span></div>
+
+					<!--Input city-->
+					<div class="row">
+						<div class="input-group search-bar">
+							<input type="text" ng-model="city" class="form-control search-box" placeholder="type here.." autofocus />
+							<span ng-click="getCity()" class="input-group-addon bar-style btn search-button" style="box-shadow: 0px 3px 15px #999999;"><i class="glyphicon glyphicon-search"></i></span>
+						</div>
+					</div>
+
+					<!--2nd label (or give us your location)-->
+					<div class="row labels"><span style="color: #fff;">or give us your location</span></div>
+
+					<!--Button for finding location-->
+					<div class="row" style="text-align:center;">
+						<button type="button" class="btn loc-button" ng-click="getLocation()"><i style="margin:10px;font-size:20px!important;" class="icon-location-arrow"></i>access location</button>
+					</div>
+				</div>
+			</div>
+			<!--Results screen-->
+			<div ng-hide="weather === True" id="results" class="col-xs-12" style="height: 100vh;">
+				<div class="row animate-bottom-2 bg-color-purple" style="height: 100vh;">
+					<div class="btn-group" role="group" aria-label="Controls" style="margin:1%;">
+						<i id="toogle-icon-2" style="color:#70ff91;font-size:25px!important;cursor:pointer;" class="icon-reorder toggle-sidebar"></i>
+					</div>
+					<div class="centered"><a href="../holy/index.html"><img style="width:30px;" src="../holy/images/umbrella.png" alt="HOME" /></a></div>
+					
+					<!--Current day weather results-->
+					<div class="row labels"><span class="green-text" style="font-family:BikoLight!important;">TODAY</span></div>
+					<div class="row labels"><span>{{weather.city.name}}, {{weather.city.country}}</span></div>
+					<div class="row labels"><img style="width:90px;" ng-src="../holy/images/{{weather.list.0.weather.0.icon}}.png" alt="" /></div>
+					<div class="row labels"><span class="green-text" >{{weather.list.0.temp.max | number:0}} <sup>o</sup>C</span><br><span style="color:#87c6bc;">{{weather.list.0.temp.min | number:0}} <sup>o</sup>C</span></div>
+					
+					<!--5 days weather results-->
+					<div class="row-fluid" style="margin:10%;">
+						<div class="col-sm-2 col-sm-offset-1 col-xs-6" >
+							<div class="row centered days">{{dayOne | date:'EEE'}}</div>
+							<div class="row centered"><img style="width:50%;" ng-src="../holy/images/{{weather.list.1.weather.0.icon}}.png" alt="" /></div>
+							<div class="row centered" style="margin-top: 15%;"><span class="green-text" >{{weather.list.1.temp.max | number:0}} <sup>o</sup>C</span><br><span style="color:#87c6bc;">{{weather.list.1.temp.min | number:0}} <sup>o</sup>C</span></div>
+						</div>
+						<div class="col-sm-2  col-xs-6">
+							<div class="row centered days ">{{dayTow | date:'EEE'}}</div>
+							<div class="row centered"><img style="width:50%;" ng-src="../holy/images/{{weather.list.1.weather.0.icon}}.png" alt="" /></div>
+							<div class="row centered" style="margin-top: 15%;"><span class="green-text" >{{weather.list.2.temp.max | number:0}} <sup>o</sup>C</span><br><span style="color:#87c6bc;">{{weather.list.2.temp.min | number:0}} <sup>o</sup>C</span></div>
+						</div>
+						<div class="col-sm-2  col-xs-6">
+							<div class="row centered days">{{dayThree | date:'EEE'}}</div>
+							<div class="row centered"><img style="width:50%;" ng-src="../holy/images/{{weather.list.1.weather.0.icon}}.png" alt="" /></div>
+							<div class="row centered" style="margin-top: 15%;"><div class="green-text" style>{{weather.list.3.temp.max | number:0}} <sup>o</sup>C</span><br><span style="color:#87c6bc;">{{weather.list.3.temp.min | number:0}} <sup>o</sup>C</div></div>
+						</div>
+						<div class="col-sm-2  col-xs-6">
+							<div class="row centered days">{{dayFour | date:'EEE'}}</div>
+							<div class="row centered"><img style="width:50%;" ng-src="../holy/images/{{weather.list.1.weather.0.icon}}.png" alt="" /></div>
+							<div class="row centered" style="margin-top: 15%;"><span class="green-text" >{{weather.list.4.temp.max | number:0}} <sup>o</sup>C</span><br><span style="color:#87c6bc;">{{weather.list.4.temp.min | number:0}} <sup>o</sup>C</span></div>
+						</div>
+						<div class="col-sm-2  col-xs-6">
+							<div class="row centered days">{{dayFive | date:'EEE'}}</div>
+							<div class="row centered"><img style="width:50%;" ng-src="../holy/images/{{weather.list.1.weather.0.icon}}.png" alt="" /></div>
+							<div class="row centered" style="margin-top: 15%;"><span class="green-text" >{{weather.list.5.temp.max | number:0}} <sup>o</sup>C</span><br><span style="color:#87c6bc;">{{weather.list.5.temp.min | number:0}} <sup>o</sup>C</span></div>
+						</div>
+					</div>	
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!--Effect for sidebar-->
+<script>
+		$(document).ready(function () {
+			$(".toggle-sidebar").click(function () {
+				$("#sidebar").toggleClass("collapsed");
+				$("#search").toggleClass("col-xs-12");
+				$("#search").toggleClass("col-xs-9");
+				$("#results").toggleClass("col-xs-12");
+				$("#results").toggleClass("col-xs-9");
+				$("#toogle-icon").toggleClass("icon-remove");
+				$("#toogle-icon").toggleClass("icon-reorder");
+				$("#toogle-icon-2").toggleClass("icon-remove");
+				$("#toogle-icon-2").toggleClass("icon-reorder");
+				return false;
+			});
+		});
+</script>
+
+<!--Loader-->
+<script>
+	//Load slider
+	function loader() {
+		var slide = setTimeout(showPage, 2000);
+	}
+	//Disappear slider and appear page content
+	function showPage() {
+		document.getElementById("loader").style.display = "none";
+		document.getElementById("content").style.display = "block";
+	}
+</script>
+</body>
+</html>
